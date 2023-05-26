@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
@@ -18,7 +18,7 @@ public class User {
     private String name;
     private LocalDate birthday;
 
-    public User(String email, String login, String name, LocalDate birthday) {
+    public User(@NotNull String login, String name, String email, LocalDate birthday) {
         this.email = email;
         this.login = login;
         this.name = name;

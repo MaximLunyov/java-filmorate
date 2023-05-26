@@ -16,16 +16,17 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
+@RequestMapping("/users")
 public class UserController {
     private Map<Integer, User> userMap = new HashMap();
     protected int id = 0;
 
-    @GetMapping("/users")
+    @GetMapping
     public List<User> userList() {
         return new ArrayList<>(userMap.values());
     }
 
-    @PostMapping("/user-add")
+    @PostMapping
     public User create(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос на добавление пользователя");
         if (validation(user)) {
@@ -35,8 +36,9 @@ public class UserController {
         return user;
     }
 
-    @PatchMapping("user-update")
+    @PutMapping
     public User update(@Valid @RequestBody User user) throws ValidationException {
+        log.info("Получен запрос на обновление пользователя");
         if (userMap.containsKey(user.getId())) {
             if (validation(user)) {
                 userMap.put(user.getId(), user);
@@ -60,7 +62,7 @@ public class UserController {
             if (user.getBirthday().isAfter(LocalDate.now())) {
                 throw new ValidationException("Дата рождения указана неверно!");
             }
-            if (user.getName().isEmpty() || user.getName().isBlank()) {
+            if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
                 user.setName(user.getLogin());
             }
             test = true;
