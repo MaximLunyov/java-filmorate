@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controllers.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -16,65 +15,65 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class UserControllerTest {
 
-    User user1;
-    User user2;
-    User user3;
+    private UserController userController;
 
     @BeforeEach
     void beforeEach() {
-        user1 = new User("example1@gmail.com", "F@LLEN@NGEL333", "Ваня", LocalDate.of(1980,1,26));
-        user2 = new User("example2@gmail.com", "DEVILDOG", "Петя", LocalDate.of(1995,8,15));
-        user3 = new User("example3@gmail.com", "KNIGHT228", "Лёша", LocalDate.of(2007,11,1));
+        userController = new UserController();
     }
 
     @Test
-    void shouldReturnTrueIfCorrectBirthDate() throws ValidationException {
-        user1.setBirthday(LocalDate.of(2023,5,23));
-        assertTrue(UserController.validation(user1));
+    void shouldCreateUser() throws ValidationException {
+        User user = userController.create(new User("F@LLEN@NGEL333", "Ваня", "example1@gmail.com",
+                LocalDate.of(1980,1,26)));
+        assertNotNull(user.getId());
     }
 
     @Test
-    void shouldReturnFalseIfIncorrectBirthDate() throws ValidationException {
-        user1.setBirthday(LocalDate.of(2025,1,1));
-        assertFalse(UserController.validation(user1));
+    void shouldUpdateUser() throws ValidationException {
+        User user1 = userController.create(new User("F@LLEN@NGEL333", "Ваня", "example1@gmail.com",
+                LocalDate.of(1980,1,26)));
+        User user2 = new User("Преисполнившийся", "Иван",
+                "example1@gmail.com", LocalDate.of(1980,1,26));
+        user2.setId(user1.getId());
+        User user3 = userController.update(user2);
+
+        assertEquals(1, userController.userList().size());
+        assertEquals(user3, userController.userList().get(0));
     }
 
     @Test
-    void shouldReturnTrueIfCorrectEmail() throws ValidationException {
-        assertTrue(UserController.validation(user1));
+    void shouldThrowsValidationExceptionIfWrongEmail() {
+        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333",
+                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
+        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333",
+                "Ваня", " ", LocalDate.of(1980,1,26))));
+        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333",
+                "Ваня", "", LocalDate.of(1980,1,26))));
     }
 
     @Test
-    void shouldReturnFalseIfIncorrectEmail() throws ValidationException {
-        user1.setEmail("LocalDate.of(2025,1,1)");
-        assertFalse(UserController.validation(user1));
-        user1.setEmail("");
-        assertFalse(UserController.validation(user1));
+    void shouldThrowsValidationExceptionIfWrongLogin() {
+        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN @NGEL333",
+                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
+        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333 ",
+                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
+        assertThrows(ValidationException.class, () -> userController.create(new User(" ",
+                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
+        assertThrows(ValidationException.class, () -> userController.create(new User("",
+                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
     }
 
     @Test
-    void shouldReturnTrueIfCorrectLogin() throws ValidationException {
-        assertTrue(UserController.validation(user1));
+    void shouldThrowsValidationExceptionIfWrongBirthDay() {
+        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333",
+                "Ваня", "example1gmail.com", LocalDate.of(2880,1,26))));
     }
 
     @Test
-    void shouldReturnFalseIfIncorrectLogin() throws ValidationException {
-        user1.setLogin("LocalDate. of(2025,1,1)");
-        assertFalse(UserController.validation(user1));
-        user1.setLogin("");
-        assertFalse(UserController.validation(user1));
-        user1.setLogin(" ");
-        assertFalse(UserController.validation(user1));
-    }
-
-    @Test
-    void shouldReplaceNameAndReturnTrueIfCorrectAll() throws ValidationException {
-        user1.setName("");
-        UserController.validation(user1);
-        assertEquals(user1.getLogin() ,user1.getName());
-
-        user1.setName(" ");
-        UserController.validation(user1);
-        assertEquals(user1.getLogin() ,user1.getName());
+    void shouldSetNameIfEmpty() throws ValidationException {
+        User user = userController.create(new User("F@LLEN@NGEL333", "", "example1@gmail.com",
+                LocalDate.of(1980,1,26)));
+        assertEquals(user.getLogin(), user.getName());
     }
 }

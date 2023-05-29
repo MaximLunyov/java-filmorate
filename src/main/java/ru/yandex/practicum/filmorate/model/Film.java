@@ -15,12 +15,12 @@ public class Film {
     @NonNull
     @NotBlank
     private String name;
-    @Size(max=200, message = "Описание не должно превышать 200 символов!")
+    @Size(max = 200, message = "Описание не должно превышать 200 символов!")
     private String description;
     private LocalDate releaseDate;
     private Duration duration;
 
-    public Film (@NotNull String name, String description, LocalDate releaseDate, long duration) {
+    public Film(@NotNull String name, String description, LocalDate releaseDate, long duration) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

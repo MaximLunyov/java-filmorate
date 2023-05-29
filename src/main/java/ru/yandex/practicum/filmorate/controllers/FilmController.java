@@ -27,44 +27,35 @@ public class FilmController {
     @PostMapping
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Получен запрос на добавление фильма");
-        if (validation(film)) {
-            film.setId(++id);
-            filmMap.put(film.getId(), film);
-        }
+        validate(film);
+        film.setId(++id);
+        filmMap.put(film.getId(), film);
+
         return film;
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Получен запрос на обновление фильма");
+        validate(film);
         if (filmMap.containsKey(film.getId())) {
-            if (validation(film)) {
-                filmMap.put(film.getId(), film);
-            }
+            filmMap.put(film.getId(), film);
         }
         return film;
     }
 
-    public static boolean validation(Film film) throws ValidationException {
-        boolean test = false;
-        try {
-            if (film.getName().isEmpty() || film.getName().isBlank()) {
-                throw new ValidationException("Название не может быть пустым!");
-            }
-            if (film.getDescription().length() > 200) {
-                throw new ValidationException("Описание не может превышать 200 символов!");
-            }
-            if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-                throw new ValidationException("Дата выхода фильма указана неверно!");
-            }
-            if (film.getDuration().toSeconds() < 0) {
-                throw new ValidationException("Длительность фильма не может быть отрицательной!");
-            }
-            test = true;
-        } catch (ValidationException e) {
-            log.info(e.getMessage());
+    public void validate(Film film) throws ValidationException {
+        if (film.getName().isEmpty() || film.getName().isBlank()) {
+            throw new ValidationException("Название не может быть пустым!");
         }
-
-        return test;
+        if (film.getDescription().length() > 200) {
+            throw new ValidationException("Описание не может превышать 200 символов!");
+        }
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            throw new ValidationException("Дата выхода фильма указана неверно!");
+        }
+        if (film.getDuration().toSeconds() < 0) {
+            throw new ValidationException("Длительность фильма не может быть отрицательной!");
+        }
     }
 }

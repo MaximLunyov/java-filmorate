@@ -29,10 +29,10 @@ public class UserController {
     @PostMapping
     public User create(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос на добавление пользователя");
-        if (validation(user)) {
-            user.setId(++id);
-            userMap.put(user.getId(), user);
-        }
+        validate(user);
+        user.setId(++id);
+        userMap.put(user.getId(), user);
+
         return user;
     }
 
@@ -40,36 +40,29 @@ public class UserController {
     public User update(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос на обновление пользователя");
         if (userMap.containsKey(user.getId())) {
-            if (validation(user)) {
-                userMap.put(user.getId(), user);
-            }
+            userMap.put(user.getId(), user);
         }
         return user;
     }
 
-    public static boolean validation(User user) throws ValidationException {
-        boolean test = false;
-        try {
-            if (!user.getEmail().contains("@") || user.getEmail().isEmpty()) {
-                throw new ValidationException("Некорректно указан Email!");
-            }
-            Pattern pattern = Pattern.compile("\\s");
-            Matcher matcher = pattern.matcher(user.getLogin());
-            boolean found = matcher.find();
-            if (user.getLogin().isEmpty() || found) {
-                throw new ValidationException("Логин не может быть пустым или содержать пробелы!");
-            }
-            if (user.getBirthday().isAfter(LocalDate.now())) {
-                throw new ValidationException("Дата рождения указана неверно!");
-            }
-            if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            test = true;
-        } catch (ValidationException e) {
-            log.info(e.getMessage());
+    public void validate(User user) throws ValidationException {
+        if (!user.getEmail().contains("@") || user.getEmail().isEmpty()) {
+            throw new ValidationException("Некорректно указан Email!");
         }
 
-        return test;
+        Pattern pattern = Pattern.compile("\\s");
+        Matcher matcher = pattern.matcher(user.getLogin());
+        boolean found = matcher.find();
+        if (user.getLogin().isEmpty() || found) {
+            throw new ValidationException("Логин не может быть пустым или содержать пробелы!");
+        }
+
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Дата рождения указана неверно!");
+        }
+
+        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 }
