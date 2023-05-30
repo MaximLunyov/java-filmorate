@@ -40,6 +40,8 @@ public class FilmController {
         validate(film);
         if (filmMap.containsKey(film.getId())) {
             filmMap.put(film.getId(), film);
+        } else {
+            throw new ValidationException("Фильм с указанным id не найден");
         }
         return film;
     }
@@ -54,7 +56,7 @@ public class FilmController {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата выхода фильма указана неверно!");
         }
-        if (film.getDuration().toSeconds() < 0) {
+        if (film.getDuration() < 0) {
             throw new ValidationException("Длительность фильма не может быть отрицательной!");
         }
     }
