@@ -26,16 +26,4 @@ public class User {
         this.name = name;
         this.birthday = birthday;
     }
-
-    /*public User(@NotBlank(message = "Логин не может быть пустым.")
-                @Pattern(regexp = "(?=\\S+$).+", message = "Логин не может содержать пробелы.") String login,
-                String name,
-                @Email String email,
-                @PastOrPresent(message = "День рождения не может быть в будущем.") LocalDate birthday) {
-
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-    }*/
 }
