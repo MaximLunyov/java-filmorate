@@ -6,8 +6,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,18 +21,21 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class FilmControllerTest {
 
+    Validator validator;
     private FilmController filmController;
 
     @BeforeEach
     void beforeEach() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
         filmController = new FilmController();
     }
 
     @Test
-    void shouldCreateFilm() throws ValidationException {
+    void shouldCreateFilm() {
         Film film = filmController.create(new Film("Аватар", "бла-бла",
                 LocalDate.of(1980,1,26), 256));
-        assertNotNull(film.getId());
+        assertEquals(1, film.getId());
     }
 
     @Test
@@ -43,7 +52,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    void shouldReturnFilmList() throws ValidationException {
+    void shouldReturnFilmList() {
         filmController.create(new Film("Аватар", "бла-бла",
                 LocalDate.of(1980,1,26), 256));
         filmController.create(new Film("Дамбо", "бла-бла-бла",
@@ -52,30 +61,34 @@ public class FilmControllerTest {
     }
 
     @Test
-    void shouldThrowsValidationExceptionIfEmptyName() {
-        assertThrows(ValidationException.class, () -> filmController.create(new Film("","",
-                LocalDate.of(2000,1,1), 259)));
+    void createEmptyNameFilm() {
+        Film film = filmController.create(new Film(" ","dawdwad",
+                LocalDate.of(1995,12,27), 259));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    void shouldThrowsValidationExceptionIfBigDescription() {
-        assertThrows(ValidationException.class, () -> filmController.create(new Film("Аватар","ApplicationEventsTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener, org.springframework.test.context.event.EventPublishingTestExecutionListener]\n" +
-                "12:01:26.435 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Skipping candidate TestExecutionListener [org.springframework.test.context.transaction.TransactionalTestExecutionListener] due to a missing dependency. Specify custom listener classes or make the default listener classes and their required dependencies available. Offending class: [org/springframework/transaction/interceptor/TransactionAttributeSource]\n" +
-                "12:01:26.436 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Skipping candidate TestExecutionListener [org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener] due to a missing dependency. Specify custom listener classes or make the default listener classes and their required dependencies available. Offending class: [org/springframework/transaction/interceptor/TransactionAttribute]\n" +
-                "12:01:26.436 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@39a8312f, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@5f6722d3, org.springframework.test.context.event.ApplicationEventsTestExecutionListener@2c532cd8, org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener@294e5088, org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener@51972dc7, org.springframework.test.context.support.DirtiesContextTestExecutionListener@3700ec9c, org.springframework.test.context.event.EventPublishingTestExecutionListener@2002348, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener@5911e990, org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener@31000e60, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener@1d470d0, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener@24d09c1, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener@54c62d71, org.springframework.boot.test.autoconfigure.webservices.client.MockWebServiceServerTestExecutionListener@65045a87]\n" +
-                "12:01:26.442 [main] DEBUG org.springframework.test.context.support.AbstractDirtiesContextTestExecutionListener - Befor",
-                LocalDate.of(2000,1,1), 259)));
+    void createWrongDescriptionFilm() {
+        Film film = filmController.create(new Film("Самый лучший фильм",new String(new char[201]),
+                LocalDate.of(1995,12,27), 259));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    void shouldThrowsValidationExceptionIfWrongDate() {
-        assertThrows(ValidationException.class, () -> filmController.create(new Film("Титаник","",
-                LocalDate.of(1895,12,27), 259)));
+    void createWrongDateFilm() {
+        Film film = filmController.create(new Film("Самый лучший фильм", "dawdaw",
+                LocalDate.of(1895, 12, 27), 259));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    void shouldThrowsValidationExceptionIfWrongDuration() {
-        assertThrows(ValidationException.class, () -> filmController.create(new Film("Титаник","",
-                LocalDate.of(1896,12,27), -1)));
+    void createWrongDurationFilm() {
+        Film film = filmController.create(new Film("Самый лучший фильм", "dawdaw",
+                LocalDate.of(1995, 12, 27), -1));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 }

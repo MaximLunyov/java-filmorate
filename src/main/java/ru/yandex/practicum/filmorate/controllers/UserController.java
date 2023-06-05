@@ -6,13 +6,10 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
@@ -27,9 +24,11 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) throws ValidationException {
+    public User create(@Valid @RequestBody User user) {
         log.info("Получен запрос на добавление пользователя");
-        validate(user);
+        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         user.setId(++id);
         userMap.put(user.getId(), user);
 
@@ -39,33 +38,14 @@ public class UserController {
     @PutMapping
     public User update(@Valid @RequestBody User user) throws ValidationException {
         log.info("Получен запрос на обновление пользователя");
-        validate(user);
+        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         if (userMap.containsKey(user.getId())) {
             userMap.put(user.getId(), user);
         } else {
             throw new ValidationException("Пользователь с указанным id не найден");
         }
         return user;
-    }
-
-    public void validate(User user) throws ValidationException {
-        if (!user.getEmail().contains("@") || user.getEmail().isEmpty()) {
-            throw new ValidationException("Некорректно указан Email!");
-        }
-
-        Pattern pattern = Pattern.compile("\\s");
-        Matcher matcher = pattern.matcher(user.getLogin());
-        boolean found = matcher.find();
-        if (user.getLogin().isEmpty() || found) {
-            throw new ValidationException("Логин не может быть пустым или содержать пробелы!");
-        }
-
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Дата рождения указана неверно!");
-        }
-
-        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
     }
 }

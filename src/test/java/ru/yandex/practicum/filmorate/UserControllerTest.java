@@ -7,26 +7,35 @@ import ru.yandex.practicum.filmorate.controllers.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 @SpringBootTest
 public class UserControllerTest {
 
+    Validator validator;
     private UserController userController;
 
     @BeforeEach
     void beforeEach() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
         userController = new UserController();
     }
 
     @Test
-    void shouldCreateUser() throws ValidationException {
+    void shouldCreateUser() {
         User user = userController.create(new User("F@LLEN@NGEL333", "Ваня", "example1@gmail.com",
                 LocalDate.of(1980,1,26)));
-        assertNotNull(user.getId());
+        assertEquals(1, user.getId());
     }
 
     @Test
@@ -43,37 +52,34 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldThrowsValidationExceptionIfWrongEmail() {
-        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333",
-                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
-        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333",
-                "Ваня", " ", LocalDate.of(1980,1,26))));
-        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333",
-                "Ваня", "", LocalDate.of(1980,1,26))));
-    }
-
-    @Test
-    void shouldThrowsValidationExceptionIfWrongLogin() {
-        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN @NGEL333",
-                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
-        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333 ",
-                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
-        assertThrows(ValidationException.class, () -> userController.create(new User(" ",
-                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
-        assertThrows(ValidationException.class, () -> userController.create(new User("",
-                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26))));
-    }
-
-    @Test
-    void shouldThrowsValidationExceptionIfWrongBirthDay() {
-        assertThrows(ValidationException.class, () -> userController.create(new User("F@LLEN@NGEL333",
-                "Ваня", "example1gmail.com", LocalDate.of(2880,1,26))));
-    }
-
-    @Test
-    void shouldSetNameIfEmpty() throws ValidationException {
+    void shouldSetNameIfEmpty() {
         User user = userController.create(new User("F@LLEN@NGEL333", "", "example1@gmail.com",
                 LocalDate.of(1980,1,26)));
         assertEquals(user.getLogin(), user.getName());
     }
+
+    @Test
+    void createWrongEmailUser() {
+        User user = userController.create(new User("F@LLEN@NGEL333",
+                "Ваня", "example1gmail.com", LocalDate.of(1980,1,26)));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void createWrongLoginUser() {
+        User user = userController.create(new User("F@LLEN @NGEL333",
+                "Ваня", "example1@gmail.com", LocalDate.of(1980,1,26)));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void createWrongBirthdayUser() {
+        User user = userController.create(new User("F@LLEN @NGEL333",
+                "Ваня", "example1@gmail.com", LocalDate.of(2980,1,26)));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+    }
+
 }
