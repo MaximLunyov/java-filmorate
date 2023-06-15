@@ -7,6 +7,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 public class User {
@@ -19,6 +21,7 @@ public class User {
     private String name;
     @PastOrPresent(message = "День рождения не может быть в будущем.")
     private LocalDate birthday;
+    private Set<Long> friends = new TreeSet<>();
 
     public User(@NotBlank String login, String name, String email, LocalDate birthday) {
         this.email = email;
