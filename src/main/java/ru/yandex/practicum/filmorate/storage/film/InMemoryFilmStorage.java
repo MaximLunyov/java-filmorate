@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
@@ -63,26 +61,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getMostPopular(String count) {
+    public List<Film> getMostPopular(int count) {
         List<Film> sortedFilmsByLikes = new ArrayList<>(filmMap.values());
 
         sortedFilmsByLikes.sort(Comparator.comparing(Film::getLikesCount));
         Collections.reverse(sortedFilmsByLikes);
 
-        if (count != null) {
-            try {
-                int t = Integer.parseInt(count);
-                if (t <= sortedFilmsByLikes.size()) {
-                    sortedFilmsByLikes.subList(t, sortedFilmsByLikes.size()).clear();
-                }
-            } catch (NumberFormatException e) {
-                log.info("Передано нечисловое значение: " + e.getMessage());
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Введите число!");
-            }
-        } else {
-            if (sortedFilmsByLikes.size() > 10) {
-                sortedFilmsByLikes.subList(10, sortedFilmsByLikes.size()).clear();
-            }
+        if (count <= sortedFilmsByLikes.size()) {
+            sortedFilmsByLikes.subList(count, sortedFilmsByLikes.size()).clear();
         }
 
         return sortedFilmsByLikes;

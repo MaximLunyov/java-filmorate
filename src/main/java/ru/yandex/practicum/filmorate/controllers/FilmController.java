@@ -26,11 +26,13 @@ public class FilmController {
 
     @GetMapping("/films")
     public List<Film> filmList() {
+        log.info("Получен запрос на получения списка фильмов");
         return filmService.findAllFilms();
     }
 
     @GetMapping("/films/{id}")
     public Film getFilmById(@PathVariable int id) {
+        log.info("Получен запрос на получения фильма с id: " + id);
         if (id <= 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -39,21 +41,25 @@ public class FilmController {
 
     @PostMapping("/films")
     public Film create(@Valid @RequestBody Film film) {
+        log.info("Получен запрос на добавление фильма: " + film);
         return filmService.createFilm(film);
     }
 
     @PutMapping("/films")
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
+        log.info("Получен запрос на обновление фильма c id: " + film.getId());
         return filmService.updateFilm(film);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
     public Film likeFilm(@PathVariable int id, @PathVariable int userId) {
+        log.info("Получен запрос установка лайка на фильм с id:" + id);
         return filmService.likeFilm(id, userId);
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
     public Film deleteLike(@PathVariable int id, @PathVariable int userId) {
+        log.info("Получен запрос на удаление лайка с фильма с id: " + id);
         if (id <= 0 || userId <= 0) {
             throw new NoSuchElementException("Id пользователя не может быть отрицательным!");
         }
@@ -61,7 +67,8 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> getMostPopular(@RequestParam(required = false) String count) {
+    public List<Film> getMostPopular(@RequestParam(defaultValue = "10") int count) {
+        log.info("Get popular films count=" + count);
         return filmService.getMostPopular(count);
     }
 

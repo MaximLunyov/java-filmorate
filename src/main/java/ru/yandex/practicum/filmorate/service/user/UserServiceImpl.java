@@ -27,37 +27,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        log.info("Получен запрос на добавление пользователя");
-        return userStorage.createUser(user);
+        return userStorage.createUser(addName(user));
     }
 
     @Override
     public User updateUser(User user) throws ValidationException {
-        log.info("Получен запрос на обновление пользователя: " + user.getLogin());
-        return userStorage.updateUser(user);
+        return userStorage.updateUser(addName(user));
     }
 
     @Override
     public User addFriend(int id, int friendId) {
-        log.info("Получен запрос на добавление друга пользователя c id: " + id);
         return userStorage.addFriend(id, friendId);
     }
 
     @Override
     public User deleteFriend(int id, int friendId) {
-        log.info("Получен запрос на удаление друга пользователя c id: " + id);
         return userStorage.deleteFriend(id, friendId);
     }
 
     @Override
     public List<User> getUserFriends(int id) {
-        log.info("Получен запрос на получение списка друзей пользователя c id: " + id);
         return userStorage.getUserFriends(id);
     }
 
     @Override
     public List<User> getCommonFriends(int id, int otherId) {
-        log.info("Получен запрос на получение списка общих друзей пользователей c id: " + id + " и " + otherId);
         return userStorage.getCommonFriends(id, otherId);
+    }
+
+    private User addName(User user) {
+        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+        return user;
     }
 }

@@ -20,5 +20,5 @@ public interface FilmService {
 
     public Film deleteLike(int id, int otherId);
 
-    public List<Film> getMostPopular(String count);
+    public List<Film> getMostPopular(int count);
 }

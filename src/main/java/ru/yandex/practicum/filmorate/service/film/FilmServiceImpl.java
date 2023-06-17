@@ -17,7 +17,6 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> findAllFilms() {
-        log.info("Получен запрос на получения списка фильмов");
         return filmStorage.findAllFilms();
     }
 
@@ -28,36 +27,26 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film createFilm(Film film) {
-        log.info("Получен запрос на добавление фильма");
         return filmStorage.createFilm(film);
     }
 
     @Override
     public Film updateFilm(Film film) throws ValidationException {
-        log.info("Получен запрос на обновление фильма");
         return filmStorage.updateFilm(film);
     }
 
     @Override
     public Film likeFilm(int id, int otherId) {
-        log.info("Получен запрос установка лайка на фильм с id:" + id);
         return filmStorage.likeFilm(id, otherId);
     }
 
     @Override
     public Film deleteLike(int id, int otherId) {
-        log.info("Получен запрос на удаление лайка с фильма с id: " + id);
         return filmStorage.deleteLike(id, otherId);
     }
 
     @Override
-    public List<Film> getMostPopular(String count) {
-        if (count != null) {
-            log.info("Получен запрос на получение " + count + " популярных фильмов.");
-        } else {
-            log.info("Получен запрос на получение 10 популярных фильмов.");
-        }
-
+    public List<Film> getMostPopular(int count) {
         return filmStorage.getMostPopular(count);
     }
 }

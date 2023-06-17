@@ -28,10 +28,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-
-        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
         user.setId(++id);
         userMap.put(user.getId(), user);
 
@@ -40,10 +36,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-
-        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
         if (userMap.containsKey(user.getId())) {
             userMap.put(user.getId(), user);
         } else {
