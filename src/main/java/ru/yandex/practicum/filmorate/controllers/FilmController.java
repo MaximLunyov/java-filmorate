@@ -2,74 +2,75 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-@Slf4j
 @RestController
+@RequestMapping("/films")
+@Slf4j
 public class FilmController {
-
-    private final FilmService filmService;
+    private FilmStorage filmStorage;
+    private FilmService filmService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(@Qualifier("filmDbStorage") FilmStorage filmStorage, FilmService filmService) {
+        this.filmStorage = filmStorage;
         this.filmService = filmService;
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public List<Film> filmList() {
-        log.info("Получен запрос на получения списка фильмов");
-        return filmService.findAllFilms();
+        return filmStorage.findAllFilms();
     }
 
-    @GetMapping("/films/{id}")
-    public Film getFilmById(@PathVariable int id) {
-        log.info("Получен запрос на получения фильма с id: " + id);
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable int id) throws ValidationException {
         if (id <= 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return filmService.getFilmById(id);
+        return filmStorage.getFilmById(id);
     }
 
-    @PostMapping("/films")
-    public Film create(@Valid @RequestBody Film film) {
-        log.info("Получен запрос на добавление фильма: " + film);
-        return filmService.createFilm(film);
+    @ResponseBody
+    @PostMapping
+    public Film create(@Valid @RequestBody Film film) throws ValidationException {
+        film = filmStorage.createFilm(film);
+        return film;
     }
 
-    @PutMapping("/films")
+    @ResponseBody
+    @PutMapping
     public Film update(@Valid @RequestBody Film film) throws ValidationException {
-        log.info("Получен запрос на обновление фильма c id: " + film.getId());
-        return filmService.updateFilm(film);
+        film = filmStorage.updateFilm(film);
+        return film;
     }
 
-    @PutMapping("/films/{id}/like/{userId}")
-    public Film likeFilm(@PathVariable int id, @PathVariable int userId) {
-        log.info("Получен запрос установка лайка на фильм с id:" + id);
-        return filmService.likeFilm(id, userId);
+    @PutMapping("/{id}/like/{userId}")
+    public void likeFilm(@PathVariable int id, @PathVariable int userId) throws ValidationException {
+        filmService.likeFilm(id, userId);
     }
 
-    @DeleteMapping("/films/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable int id, @PathVariable int userId) {
-        log.info("Получен запрос на удаление лайка с фильма с id: " + id);
-        if (id <= 0 || userId <= 0) {
-            throw new NoSuchElementException("Id пользователя не может быть отрицательным!");
-        }
-        return filmService.deleteLike(id, userId);
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLike(@PathVariable int id, @PathVariable int userId) throws ValidationException {
+        filmService.deleteLike(id, userId);
     }
 
-    @GetMapping("/films/popular")
-    public List<Film> getMostPopular(@RequestParam(defaultValue = "10") int count) {
-        log.info("Get popular films count=" + count);
-        return filmService.getMostPopular(count);
+    @DeleteMapping("/{id}")
+    public Film delete(@PathVariable int id) throws ValidationException {
+        return filmStorage.delete(id);
     }
 
+    @GetMapping("/popular")
+    public List<Film> getPopular(@RequestParam(name = "count", defaultValue = "10") Integer count) {
+        return filmService.getPopular(count);
+    }
 }
