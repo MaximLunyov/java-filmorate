@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @Component("likeDbStorage")
-public class LikeDbStorage implements LikeStorage{
+public class LikeDbStorage implements LikeStorage {
     private final JdbcTemplate jdbcTemplate;
     private MpaService mpaService;
     private GenreService genreService;

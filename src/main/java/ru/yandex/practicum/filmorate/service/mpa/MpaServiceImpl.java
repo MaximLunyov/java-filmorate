@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @Service
-public class MpaServiceImpl implements MpaService{
+public class MpaServiceImpl implements MpaService {
 
     private MpaStorage mpaStorage;
 

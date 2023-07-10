@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 
 @Slf4j
 @Component
-public class GenreDbStorage implements GenreStorage{
+public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
