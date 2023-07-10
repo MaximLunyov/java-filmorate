@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 
 @Component
-public class FriendDbStorage implements FriendStorage{
+public class FriendDbStorage implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
     private UserStorage userStorage;
 
