@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Set;
 
 public interface GenreService {
+
     public Collection<Genre> getGenres();
 
     public Genre getGenreById(Integer id) throws ValidationException;

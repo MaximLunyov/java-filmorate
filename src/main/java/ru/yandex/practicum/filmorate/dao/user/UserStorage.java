@@ -9,6 +9,7 @@ public interface UserStorage {
     public List<User> findAllUsers();
 
     public User findUserById(int id);
+
     public User createUser(User user);
 
     public User updateUser(User user) throws ValidationException;
