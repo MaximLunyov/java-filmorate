@@ -10,7 +10,10 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Builder
 @Data
@@ -26,18 +29,16 @@ public class Film {
     private LocalDate releaseDate;
     @Min(value = 0, message = "Продолжительность фильма не может быть отрицательной.")
     private int duration;
-    private Set<Long> likes = new TreeSet<>();
     private Mpa mpa;
     private Set<Genre> genres = new HashSet<>();
 
     public Film(int id, String name, String description, LocalDate releaseDate, Integer duration,
-                Set<Long> likes, Mpa mpa, Set<Genre> genres) {
+                Mpa mpa, Set<Genre> genres) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.likes = likes;
         this.mpa = mpa;
         this.genres = genres;
     }
@@ -51,8 +52,4 @@ public class Film {
         values.put("rating_id", mpa.getId());
         return values;
     }
-
-    /*public int getLikesCount() {
-        return likes.size();
-    }*/
 }

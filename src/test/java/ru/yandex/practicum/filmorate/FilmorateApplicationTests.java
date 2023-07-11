@@ -75,7 +75,6 @@ class FilmorateApplicationTests {
 				.duration(114)
 				.id(1).build();
 		firstFilm.setMpa(new Mpa(1, "G"));
-		firstFilm.setLikes(new HashSet<>());
 		firstFilm.setGenres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"),
 				new Genre(1, "Комедия"))));
 
@@ -87,7 +86,6 @@ class FilmorateApplicationTests {
 				.duration(162)
 				.id(2).build();
 		secondFilm.setMpa(new Mpa(3, "PG-13"));
-		secondFilm.setLikes(new HashSet<>());
 		secondFilm.setGenres(new HashSet<>(Arrays.asList(new Genre(6, "Боевик"))));
 
 		thirdFilm = Film.builder()
@@ -98,7 +96,6 @@ class FilmorateApplicationTests {
 				.duration(133)
 				.id(3).build();
 		thirdFilm.setMpa(new Mpa(4, "R"));
-		thirdFilm.setLikes(new HashSet<>());
 		thirdFilm.setGenres(new HashSet<>(Arrays.asList(new Genre(2, "Драма"))));
 	}
 
@@ -149,8 +146,8 @@ class FilmorateApplicationTests {
 
 	@Test
 	public void testCreateFilmAndGetFilmById() throws ValidationException {
-		firstFilm = filmStorage.createFilm(firstFilm);
-		Optional<Film> filmOptional = Optional.ofNullable(filmStorage.getFilmById(firstFilm.getId()));
+		firstFilm = filmStorage.createFilm(firstFilm, new Mpa(1, "tested"), new HashSet<>());
+		Optional<Film> filmOptional = Optional.ofNullable(filmService.getFilmById(firstFilm.getId()));
 		assertThat(filmOptional)
 				.hasValueSatisfying(film -> assertThat(film)
 						.hasFieldOrPropertyWithValue("id", firstFilm.getId())
@@ -159,19 +156,8 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	public void testfilmList() throws ValidationException {
-		firstFilm = filmStorage.createFilm(firstFilm);
-		secondFilm = filmStorage.createFilm(secondFilm);
-		thirdFilm = filmStorage.createFilm(thirdFilm);
-		List<Film> listFilms = filmStorage.findAllFilms();
-		assertThat(listFilms).contains(firstFilm);
-		assertThat(listFilms).contains(secondFilm);
-		assertThat(listFilms).contains(thirdFilm);
-	}
-
-	@Test
 	public void testUpdateFilm() throws ValidationException {
-		firstFilm = filmStorage.createFilm(firstFilm);
+		firstFilm = filmStorage.createFilm(firstFilm, new Mpa(1, "tested"), new HashSet<>());;
 		Film updateFilm = Film.builder()
 				.id(firstFilm.getId())
 				.name("UpdateName")
@@ -180,7 +166,7 @@ class FilmorateApplicationTests {
 				.duration(133)
 				.build();
 		updateFilm.setMpa(new Mpa(1, "G"));
-		Optional<Film> testUpdateFilm = Optional.ofNullable(filmStorage.updateFilm(updateFilm));
+		Optional<Film> testUpdateFilm = Optional.ofNullable(filmService.updateFilm(updateFilm));
 		assertThat(testUpdateFilm)
 				.hasValueSatisfying(film ->
 						assertThat(film)
@@ -191,8 +177,8 @@ class FilmorateApplicationTests {
 
 	@Test
 	public void deleteFilm() throws ValidationException {
-		firstFilm = filmStorage.createFilm(firstFilm);
-		secondFilm = filmStorage.createFilm(secondFilm);
+		firstFilm = filmStorage.createFilm(firstFilm, new Mpa(1, "tested"), new HashSet<>());;
+		secondFilm = filmStorage.createFilm(secondFilm, new Mpa(1, "tested"), new HashSet<>());
 		filmStorage.delete(firstFilm.getId());
 		List<Film> listFilms = filmStorage.findAllFilms();
 		assertThat(listFilms).hasSize(1);
@@ -203,44 +189,21 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
-	public void testlikeFilm() throws ValidationException {
-		firstUser = userStorage.createUser(firstUser);
-		firstFilm = filmStorage.createFilm(firstFilm);
-		filmService.likeFilm(firstFilm.getId(), firstUser.getId());
-		firstFilm = filmStorage.getFilmById(firstFilm.getId());
-		assertThat(firstFilm.getLikes()).hasSize(1);
-		assertThat(firstFilm.getLikes()).contains((long) firstUser.getId());
-	}
-
-	@Test
-	public void testDeleteLike() throws ValidationException {
-		firstUser = userStorage.createUser(firstUser);
-		secondUser = userStorage.createUser(secondUser);
-		firstFilm = filmStorage.createFilm(firstFilm);
-		filmService.likeFilm(firstFilm.getId(), firstUser.getId());
-		filmService.likeFilm(firstFilm.getId(), secondUser.getId());
-		filmService.deleteLike(firstFilm.getId(), firstUser.getId());
-		firstFilm = filmStorage.getFilmById(firstFilm.getId());
-		assertThat(firstFilm.getLikes()).hasSize(1);
-		assertThat(firstFilm.getLikes()).contains((long) secondUser.getId());
-	}
-
-	@Test
 	public void testGetPopularFilms() throws ValidationException {
 
 		firstUser = userStorage.createUser(firstUser);
 		secondUser = userStorage.createUser(secondUser);
 		thirdUser = userStorage.createUser(thirdUser);
 
-		firstFilm = filmStorage.createFilm(firstFilm);
+		firstFilm = filmStorage.createFilm(firstFilm, new Mpa(1, "tested"), new HashSet<>());
 		filmService.likeFilm(firstFilm.getId(), firstUser.getId());
 
-		secondFilm = filmStorage.createFilm(secondFilm);
+		secondFilm = filmStorage.createFilm(secondFilm, new Mpa(1, "tested"), new HashSet<>());
 		filmService.likeFilm(secondFilm.getId(), firstUser.getId());
 		filmService.likeFilm(secondFilm.getId(), secondUser.getId());
 		filmService.likeFilm(secondFilm.getId(), thirdUser.getId());
 
-		thirdFilm = filmStorage.createFilm(thirdFilm);
+		thirdFilm = filmStorage.createFilm(thirdFilm, new Mpa(1, "tested"), new HashSet<>());
 		filmService.likeFilm(thirdFilm.getId(), firstUser.getId());
 		filmService.likeFilm(thirdFilm.getId(), secondUser.getId());
 

@@ -11,5 +11,13 @@ public interface FilmService {
 
     public void deleteLike(int filmId, int userId) throws ValidationException;
 
-    public List<Film> getPopular(Integer count);
+    public List<Film> getPopular(Integer count) throws ValidationException;
+
+    public List<Film> findAllFilms() throws ValidationException;
+
+    public Film getFilmById(int filmId) throws ValidationException;
+
+    public Film createFilm(Film film) throws ValidationException;
+
+    public Film updateFilm(Film film) throws ValidationException;
 }

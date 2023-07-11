@@ -28,22 +28,20 @@ public class UserServiceImpl implements UserService {
         if (userId == friendId) {
             throw new ValidationException("Нельзя добавить самого себя в друзья!");
         }
-        friendStorage.addFriend(userId, friendId);
+        friendStorage.addFriend(userStorage.findUserById(userId),
+                userStorage.findUserById(friendId), userId, friendId);
     }
 
     public void deleteFriend(int userId, int friendId) throws ValidationException {
         if (userId == friendId) {
             throw new ValidationException("Нельзя удалить самого себя из друзей!");
         }
-        friendStorage.deleteFriend(userId, friendId);
+        friendStorage.deleteFriend(userStorage.findUserById(userId),
+                userStorage.findUserById(friendId), userId, friendId);
     }
 
     public List<User> getFriends(int userId) {
-        List<User> friends = new ArrayList<>();
-
-        friends = friendStorage.getFriends(userId);
-
-        return friends;
+        return friendStorage.getFriends(userStorage.findUserById(userId), userId);
     }
 
     public List<User> getCommonFriends(int firstUserId, int secondUserId) {
@@ -53,9 +51,9 @@ public class UserServiceImpl implements UserService {
         Set<User> intersection = null;
 
         if ((firstUser != null) && (secondUser != null)) {
-            intersection = new HashSet<>(friendStorage.getFriends(firstUserId));
-            intersection.retainAll(friendStorage.getFriends(secondUserId));
+            intersection = new HashSet<>(friendStorage.getFriends(firstUser, firstUserId));
+            intersection.retainAll(friendStorage.getFriends(secondUser, secondUserId));
         }
-        return new ArrayList<User>(intersection);
+        return new ArrayList<>(intersection);
     }
 }

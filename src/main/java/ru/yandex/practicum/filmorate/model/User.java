@@ -24,10 +24,6 @@ public class User {
     private LocalDate birthday;
     private Set<Long> friends = new TreeSet<>();
 
-    public void addFriend(int friendId) {
-        friends.add((long) friendId);
-    }
-
     public User(int id, String email, String login, String name, LocalDate birthday, Set<Long> friends) {
         this.id = id;
         this.email = email;

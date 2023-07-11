@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.dao.friend;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -12,17 +10,13 @@ import java.util.List;
 @Component
 public class FriendDbStorage implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
-    private UserStorage userStorage;
 
     @Autowired
-    public FriendDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("userDbStorage") UserStorage userStorage) {
+    public FriendDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.userStorage = userStorage;
     }
 
-    public void addFriend(int userId, int friendId) {
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
+    public void addFriend(User user, User friend, int userId, int friendId) {
         if ((user != null) && (friend != null)) {
             boolean status = false;
             if (friend.getFriends().contains(userId)) {
@@ -34,9 +28,7 @@ public class FriendDbStorage implements FriendStorage {
         }
     }
 
-    public void deleteFriend(int userId, int friendId) {
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
+    public void deleteFriend(User user, User friend, int userId, int friendId) {
         if ((user != null) && (friend != null)) {
             jdbcTemplate.update("DELETE FROM friends WHERE user_id = ? AND friend_id = ?", userId, friendId);
             if (friend.getFriends().contains(userId)) {
@@ -46,8 +38,7 @@ public class FriendDbStorage implements FriendStorage {
         }
     }
 
-    public List<User> getFriends(int userId) {
-        User user = userStorage.findUserById(userId);
+    public List<User> getFriends(User user, int userId) {
         if (user != null) {
             return jdbcTemplate.query("SELECT friend_id, email, login, name, birthday FROM friends" +
                             " INNER JOIN users ON friends.friend_id = users.id WHERE friends.user_id = ?",
