@@ -6,20 +6,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 
 public interface UserService {
+    public void addFriend(int userId, int friendId) throws ValidationException;
 
-    public List<User> findAllUsers();
+    public void deleteFriend(int userId, int friendId) throws ValidationException;
 
-    public User findUserById(int id);
+    public List<User> getFriends(int userId);
 
-    public User createUser(User user);
-
-    public User updateUser(User user) throws ValidationException;
-
-    public User addFriend(int id, int friendId);
-
-    public User deleteFriend(int id, int friendId);
-
-    public List<User> getUserFriends(int id);
-
-    public List<User> getCommonFriends(int id, int otherId);
+    public List<User> getCommonFriends(int firstUserId, int secondUserId);
 }

@@ -68,7 +68,6 @@ public class FilmControllerTest {
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }
-
     @Test
     void createWrongDescriptionFilm() {
         Film film = filmController.create(new Film("Самый лучший фильм",new String(new char[201]),

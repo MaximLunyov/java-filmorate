@@ -1,18 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import org.hibernate.validator.constraints.Length;
-import org.jetbrains.annotations.NotNull;
 import ru.yandex.practicum.filmorate.validators.FilmRelease;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
+@Builder
 @Data
 public class Film {
     private int id;
@@ -26,16 +29,27 @@ public class Film {
     private LocalDate releaseDate;
     @Min(value = 0, message = "Продолжительность фильма не может быть отрицательной.")
     private int duration;
-    private Set<Long> likes = new TreeSet<>();
+    private Mpa mpa;
+    private Set<Genre> genres = new HashSet<>();
 
-    public Film(@NotNull String name, String description, LocalDate releaseDate, int duration) {
+    public Film(int id, String name, String description, LocalDate releaseDate, Integer duration,
+                Mpa mpa, Set<Genre> genres) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.mpa = mpa;
+        this.genres = genres;
     }
 
-    public int getLikesCount() {
-       return likes.size();
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("name", name);
+        values.put("description", description);
+        values.put("release_Date", releaseDate);
+        values.put("duration", duration);
+        values.put("rating_id", mpa.getId());
+        return values;
     }
 }

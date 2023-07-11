@@ -23,11 +23,9 @@ public class ErrorHandler {
     public ErrorResponse handleNotFound(final NoSuchElementException e) {
         return new ErrorResponse("404 - Искомый объект не найден");
     }
-
-    @ExceptionHandler
+    /*@ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleInternalServerError(final RuntimeException e) {
         return new ErrorResponse("500 - Внутренняя ошибка сервера");
-    }
-
+    }*/
 }

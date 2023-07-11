@@ -1,24 +1,23 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 
-@Component
 public interface FilmService {
-    public List<Film> findAllFilms();
 
-    public Film getFilmById(int id);
+    public void likeFilm(int filmId, int userId) throws ValidationException;
 
-    public Film createFilm(Film film);
+    public void deleteLike(int filmId, int userId) throws ValidationException;
+
+    public List<Film> getPopular(Integer count) throws ValidationException;
+
+    public List<Film> findAllFilms() throws ValidationException;
+
+    public Film getFilmById(int filmId) throws ValidationException;
+
+    public Film createFilm(Film film) throws ValidationException;
 
     public Film updateFilm(Film film) throws ValidationException;
-
-    public Film likeFilm(int id, int otherId);
-
-    public Film deleteLike(int id, int otherId);
-
-    public List<Film> getMostPopular(int count);
 }
